@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.1
+
+- CPU profiler categories are measured with player loop markers and work with any render pipeline.
+  Previously Rendering used `Camera.Render` (Built-in RP only), UI used a missing marker and Scripts was
+  "frame time minus everything else", including vsync wait. Markers registered later are picked up on retry.
+- In release builds category times are not recorded by Unity; the panel shows `n/a` instead of `0`.
+- New `Total` value: main thread CPU time without waiting for the target frame rate, render thread or GPU
+  (`ICheatsCpuProfilerService.CurrentCpuTimeMs`). Works in release builds too.
+- CPU graph shows the rest of the CPU work as an `Other` part; main thread idle time is left as an empty gap.
+- Fixed `CheatsGraphFrameSample.TryGetPart` returning inverted results.
+
 ## 0.2.0
 
 - Cheats are disabled in non-development builds unless `Enable In Release Builds` is set in `CheatsSettings`.

@@ -40,7 +40,7 @@ https://github.com/alinouski/SMCheats.git
 }
 ```
 
-Конкретная версия — по тегу или коммиту: `https://github.com/alinouski/SMCheats.git#0.1.0`.
+Конкретная версия — по тегу или коммиту: `https://github.com/alinouski/SMCheats.git#v0.2.1`.
 
 ### Как embedded-пакет
 
@@ -301,6 +301,23 @@ foreach (var level in levels)
 - Свойства — с геттером и без индексаторов. Поля (`[Cheat]` на field) не поддерживаются.
 - `[CheatRange]` / `[CheatStep]` — только для `int` и `float`, и не вместе с `[CheatDropdown]`.
 - Статические члены как читы не сканируются (но могут быть источником для `[CheatDropdown]` / `[CheatVisibleIf]`).
+
+## Профайлер
+
+Вкладка Profiler показывает FPS и CPU:
+
+| Поле | Что значит |
+|---|---|
+| Min / Max / Avg | Время кадра за последние 150 кадров |
+| Total | Сколько главный поток реально работал в текущем кадре: время кадра минус ожидание target FPS / vsync, render thread и GPU |
+| Scripts / Rendering / Physics | Время этих систем в текущем кадре |
+| Other | Остальная работа CPU: `Total` минус категории |
+
+На графике столбик — полное время кадра; цветные части — категории и Other, пустой промежуток сверху — простой.
+Если простоя почти нет, игра упирается в CPU.
+
+Категории Unity записывает только в редакторе и Development Build, в release-сборке они показываются как `n/a`.
+Время кадра и `Total` работают везде.
 
 ## PIN-код
 

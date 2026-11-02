@@ -87,27 +87,32 @@ namespace SMCheats
                 case 0:
                 {
                     value = FramePart0;
-                    return float.IsNegativeInfinity(FramePart0);
+                    return !float.IsNegativeInfinity(FramePart0);
                 }
                 case 1:
                 {
                     value = FramePart1;
-                    return float.IsNegativeInfinity(FramePart1);
+                    return !float.IsNegativeInfinity(FramePart1);
                 }
                 case 2:
                 {
                     value = FramePart2;
-                    return float.IsNegativeInfinity(FramePart2);
+                    return !float.IsNegativeInfinity(FramePart2);
                 }
                 case 3:
                 {
                     value = FramePart3;
-                    return float.IsNegativeInfinity(FramePart3);
+                    return !float.IsNegativeInfinity(FramePart3);
                 }
                 case 4:
                 {
                     value = FramePart4;
-                    return float.IsNegativeInfinity(FramePart5);
+                    return !float.IsNegativeInfinity(FramePart4);
+                }
+                case 5:
+                {
+                    value = FramePart5;
+                    return !float.IsNegativeInfinity(FramePart5);
                 }
                 default:
                     value = 0;

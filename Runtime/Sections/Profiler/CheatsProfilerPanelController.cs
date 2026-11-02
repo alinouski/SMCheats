@@ -142,25 +142,52 @@ namespace SMCheats
                         static s => s.ToString("0.0 ms", CultureInfo.InvariantCulture)),
 
                     new CheatsGraphCurrentValueSource(
+                        "Total",
+                        () => cpuProfilerService.CurrentCpuTimeMs,
+                        static s => s.ToString("0.00 ms", CultureInfo.InvariantCulture)),
+
+                    CreateCpuCategoryValueSource(
                         "Scripts",
-                        () => cpuProfilerService.GetCategoryMsUsage(CheatsCpuProfilerCategory.Scripts),
-                        static s => s.ToString("0.0 ms", CultureInfo.InvariantCulture),
+                        cpuProfilerService,
+                        CheatsCpuProfilerCategory.Scripts,
                         colorConfigs.GetDataColor(1)),
 
-                    new CheatsGraphCurrentValueSource(
+                    CreateCpuCategoryValueSource(
                         "Rendering",
-                        () => cpuProfilerService.GetCategoryMsUsage(CheatsCpuProfilerCategory.Rendering),
-                        static s => s.ToString("0.0 ms", CultureInfo.InvariantCulture),
+                        cpuProfilerService,
+                        CheatsCpuProfilerCategory.Rendering,
                         colorConfigs.GetDataColor(0)),
 
-                    new CheatsGraphCurrentValueSource(
+                    CreateCpuCategoryValueSource(
                         "Physics",
-                        () => cpuProfilerService.GetCategoryMsUsage(CheatsCpuProfilerCategory.Physics),
-                        static s => s.ToString("0.0 ms", CultureInfo.InvariantCulture),
+                        cpuProfilerService,
+                        CheatsCpuProfilerCategory.Physics,
                         colorConfigs.GetDataColor(2)),
+
+                    new CheatsGraphCurrentValueSource(
+                        "Other",
+                        () => GetCpuOtherMs(cpuProfilerService, CpuGraphCategories),
+                        static s => s.ToString("0.00 ms", CultureInfo.InvariantCulture),
+                        colorConfigs.GetDataColor(CpuGraphCategories.Length)),
                 },
                 new CheatsGraphFrameValueSource(() => CreateCpuFrameSample(cpuProfilerService, CpuGraphCategories)),
                 cpuProfilerService.SampleCapacity);
+        }
+
+        private static CheatsGraphCurrentValueSource CreateCpuCategoryValueSource(
+            string name,
+            ICheatsCpuProfilerService profiler,
+            CheatsCpuProfilerCategory category,
+            Color color)
+        {
+            // Category markers are not recorded in release builds, so "n/a" is shown instead of a misleading zero.
+            return new CheatsGraphCurrentValueSource(
+                name,
+                () => profiler.GetCategoryMsUsage(category),
+                value => profiler.IsCategoryAvailable(category)
+                    ? value.ToString("0.00 ms", CultureInfo.InvariantCulture)
+                    : "n/a",
+                color);
         }
 
         private CheatsGraphView CreatePinnedGraphView()
@@ -208,7 +235,21 @@ namespace SMCheats
                 frameSample.SetPart(i, profiler.GetCategoryMsUsage(categories[i]));
             }
 
+            // The rest of the CPU work; time the main thread waits stays as an empty gap up to the frame time.
+            frameSample.SetPart(categories.Length, GetCpuOtherMs(profiler, categories));
+
             return frameSample;
+        }
+
+        private static float GetCpuOtherMs(ICheatsCpuProfilerService profiler, CheatsCpuProfilerCategory[] categories)
+        {
+            var categoriesMs = 0f;
+            for (var i = 0; i < categories.Length; i++)
+            {
+                categoriesMs += profiler.GetCategoryMsUsage(categories[i]);
+            }
+
+            return Mathf.Max(0f, profiler.CurrentCpuTimeMs - categoriesMs);
         }
     }
 }

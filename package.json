@@ -1,6 +1,6 @@
 {
   "name": "com.alinouski.smcheats",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "displayName": "SM Cheats",
   "description": "Runtime cheats panel with options, console, profiler graphs, device info and PIN-protected activation.",
   "unity": "6000.3",
