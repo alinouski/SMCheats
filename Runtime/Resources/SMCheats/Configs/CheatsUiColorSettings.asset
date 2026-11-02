@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18f8d742f6fc4c56bb15a54a19f031db, type: 3}
+  m_Name: CheatsUiColorSettings
+  m_EditorClassIdentifier: SMCheats.Runtime::SMCheats.CheatsUiColorSettings
+  _textColor: {r: 1, g: 1, b: 1, a: 1}
+  _iconColor: {r: 1, g: 1, b: 1, a: 1}
+  _buttonSelectedBackgroundColor: {r: 0.24, g: 0.34, b: 0.2, a: 0.96}
+  _sectionButtonBackgroundColor: {r: 0.16, g: 0.18, b: 0.22, a: 0.92}
+  _sectionButtonEmphasizedBackgroundColor: {r: 0.24, g: 0.34, b: 0.2, a: 0.96}
+  _toggleButtonActiveBackgroundColor: {r: 0.2392157, g: 0.34117648, b: 0.20000002, a: 0.9607843}
+  _toggleButtonInactiveBackgroundColor: {r: 0.18, g: 0.2, b: 0.24, a: 1}
+  _toggleButtonActiveIconColor: {r: 1, g: 1, b: 1, a: 1}
+  _toggleButtonInactiveIconColor: {r: 1, g: 1, b: 1, a: 0.48}
+  _optionBackgroundColor: {r: 0.19999999, g: 0.19999999, b: 0.19999999, a: 0.16}
+  _optionControlBackgroundColor: {r: 0.18, g: 0.2, b: 0.24, a: 1}
+  _consoleLogEntryBackgroundColor: {r: 0.13, g: 0.17, b: 0.21, a: 0.92}
+  _consoleWarningEntryBackgroundColor: {r: 0.36, g: 0.28, b: 0.08, a: 0.94}
+  _consoleErrorEntryBackgroundColor: {r: 0.42, g: 0.12, b: 0.12, a: 0.96}
+  _consoleSelectedEntryBackgroundColor: {r: 0.14, g: 0.34, b: 0.42, a: 0.98}
+  _consoleLogTypeColor: {r: 0.5698112, g: 0.5698112, b: 0.5698112, a: 1}
+  _consoleWarningTypeColor: {r: 1, g: 0.7724564, b: 0.33018857, a: 1}
+  _consoleErrorTypeColor: {r: 1, g: 0.3406788, b: 0.3075471, a: 1}
+  _consoleExceptionIndicatorIdleColor: {r: 1, g: 1, b: 1, a: 0}
+  _consoleExceptionIndicatorFlashColor: {r: 1, g: 0.33257863, b: 0.28490567, a: 1}
+  _readyToPinColor: {r: 0.118867874, g: 0.53114855, b: 1, a: 0.39215687}
+  _pinnedColor: {r: 0.23921567, g: 1, b: 0.34403288, a: 0.39215687}
+  _pinnedScreenColor: {r: 0.14, g: 0.28, b: 0.36, a: 0.42}
