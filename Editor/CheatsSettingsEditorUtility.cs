@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Cheats.Editor
+namespace SMCheats.Editor
 {
     public static partial class CheatsSettingsEditorUtility
     {
@@ -13,6 +13,7 @@ namespace Cheats.Editor
         internal const string SettingsResourcePath = SMCheats.CheatsSettings.ResourcePath;
         internal const string DefaultSettingsAssetPath = "Assets/Resources/" + SettingsResourcePath + ".asset";
         internal const string ColorSettingsAssetPath = ResourcesFolderPath + "/" + SMCheats.CheatsUiColorSettings.ResourcePath + ".asset";
+        internal const string ProjectColorSettingsAssetPath = "Assets/Resources/" + SMCheats.CheatsUiColorSettings.ResourcePath + ".asset";
         internal const string RuntimeViewResourcesFolderPath = ResourcesFolderPath + "/SMCheats";
         internal const string RuntimeViewPrefabPath = ResourcesFolderPath + "/" + SMCheats.CheatsPrefabResourcePaths.CheatsView + ".prefab";
         internal const string ActivationViewPrefabPath = ResourcesFolderPath + "/" + SMCheats.CheatsPrefabResourcePaths.ActivationView + ".prefab";
@@ -99,8 +100,22 @@ namespace Cheats.Editor
                 return existing;
             }
 
+            existing = AssetDatabase.LoadAssetAtPath<global::SMCheats.CheatsUiColorSettings>(ProjectColorSettingsAssetPath);
+            if (existing != null)
+            {
+                return existing;
+            }
+
+            // The package folder is read-only when installed from git, so a missing asset is created in the project.
+            var folderPath = Path.GetDirectoryName(ProjectColorSettingsAssetPath);
+            if (!string.IsNullOrEmpty(folderPath) && !Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+                AssetDatabase.Refresh();
+            }
+
             var colorSettings = ScriptableObject.CreateInstance<global::SMCheats.CheatsUiColorSettings>();
-            AssetDatabase.CreateAsset(colorSettings, ColorSettingsAssetPath);
+            AssetDatabase.CreateAsset(colorSettings, ProjectColorSettingsAssetPath);
             return colorSettings;
         }
 

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SMCheats
 {
-    internal sealed class CheatsPanelTabButton : ICheatsTabButton
+    public sealed class CheatsPanelTabButton : ICheatsTabButton
     {
         private readonly string _panelId;
         private readonly CheatsButtonView _buttonView;

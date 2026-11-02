@@ -71,7 +71,8 @@ namespace SMCheats
                     member.GetCustomAttribute<CheatStepAttribute>(),
                     member.GetCustomAttribute<CheatVisibleIfAttribute>()))
                 .Where(member => member.Cheat != null)
-                .OrderBy(member => GetDeclarationOrder(member.Cheat, member.Member))
+                .OrderBy(member => member.Cheat.SortOrder)
+                .ThenBy(member => member.Cheat.LineNumber)
                 .ThenBy(member => member.Member.MetadataToken)
                 .ToArray();
             MembersByType[targetType] = members;
@@ -347,21 +348,6 @@ namespace SMCheats
             }
 
             return new CheatDropdownChoice(Convert.ToString(labelValue) ?? "null", choiceValue);
-        }
-
-        private static int GetDeclarationOrder(CheatAttribute attribute, MemberInfo member)
-        {
-            if (attribute.SortOrder != 0)
-            {
-                return attribute.SortOrder;
-            }
-
-            if (attribute.LineNumber != 0)
-            {
-                return attribute.LineNumber;
-            }
-
-            return member.MetadataToken;
         }
 
         private static string GetDisplayName(CheatAttribute attribute, string fallbackName)

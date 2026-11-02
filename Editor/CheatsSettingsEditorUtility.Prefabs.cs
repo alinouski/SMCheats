@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Cheats.Editor
+namespace SMCheats.Editor
 {
     public static partial class CheatsSettingsEditorUtility
     {

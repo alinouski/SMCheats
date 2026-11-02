@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace SMCheats
 {
-    public sealed class CheatsConsoleService : IDisposable
+    public sealed class CheatsConsoleService : IDisposable, ICheatsUpdateTickable
     {
         private const int MaxMessageChars = 4096;
         private const int MaxStackTraceChars = 12000;
@@ -17,6 +18,8 @@ namespace SMCheats
         private readonly int _maximumEntries;
         private bool _isListening;
         private int _nextEntryId;
+        private int _mainThreadId;
+        private int _pendingExceptionNotifications;
 
         public CheatsConsoleService(int maximumEntries)
         {
@@ -44,7 +47,8 @@ namespace SMCheats
                 return;
             }
 
-            Application.logMessageReceived += HandleLogMessageReceived;
+            _mainThreadId = Thread.CurrentThread.ManagedThreadId;
+            Application.logMessageReceivedThreaded += HandleLogMessageReceived;
             _isListening = true;
         }
 
@@ -55,7 +59,7 @@ namespace SMCheats
                 return;
             }
 
-            Application.logMessageReceived -= HandleLogMessageReceived;
+            Application.logMessageReceivedThreaded -= HandleLogMessageReceived;
             _isListening = false;
         }
 
@@ -117,10 +121,12 @@ namespace SMCheats
             var message = Trim(condition, MaxMessageChars);
             var safeStackTrace = Trim(stackTrace, MaxStackTraceChars);
             var key = new LogKey(type, message, safeStackTrace);
-            var scene = SceneManager.GetActiveScene();
-            var sceneName = string.IsNullOrEmpty(scene.name) ? scene.buildIndex.ToString() : scene.name;
+            var threadId = Thread.CurrentThread.ManagedThreadId;
+            var isMainThread = threadId == _mainThreadId;
+            // Scene and frame APIs are main-thread only.
+            var sceneName = isMainThread ? GetActiveSceneName() : $"Thread {threadId}";
             var time = DateTime.Now;
-            var frameCount = Time.frameCount;
+            var frameCount = isMainThread ? Time.frameCount : -1;
             var isException = type == LogType.Exception;
 
             lock (_sync)
@@ -161,10 +167,33 @@ namespace SMCheats
                 }
             }
 
-            if (isException)
+            if (!isException)
+            {
+                return;
+            }
+
+            if (isMainThread)
             {
                 ExceptionReceived?.Invoke();
             }
+            else
+            {
+                Interlocked.Increment(ref _pendingExceptionNotifications);
+            }
+        }
+
+        void ICheatsUpdateTickable.Tick()
+        {
+            if (Interlocked.Exchange(ref _pendingExceptionNotifications, 0) > 0)
+            {
+                ExceptionReceived?.Invoke();
+            }
+        }
+
+        private static string GetActiveSceneName()
+        {
+            var scene = SceneManager.GetActiveScene();
+            return string.IsNullOrEmpty(scene.name) ? scene.buildIndex.ToString() : scene.name;
         }
 
         private void AddCounter(LogType type, int amount)

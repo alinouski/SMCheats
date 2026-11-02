@@ -2,11 +2,12 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Cheats.Editor
+namespace SMCheats.Editor
 {
     [CustomEditor(typeof(global::SMCheats.CheatsSettings))]
     public sealed class CheatsSettingsEditor : UnityEditor.Editor
     {
+        private SerializedProperty _enableInReleaseBuildsProperty;
         private SerializedProperty _defaultTabIdProperty;
         private SerializedProperty _enabledTabsProperty;
         private SerializedProperty _openMethodsProperty;
@@ -19,10 +20,12 @@ namespace Cheats.Editor
         private SerializedProperty _maximumConsoleEntriesProperty;
         private SerializedProperty _profilerFpsGraphVisualConfigProperty;
         private SerializedProperty _profilerCpuGraphVisualConfigProperty;
+        private SerializedProperty _profilerMemoryGraphVisualConfigProperty;
         private SerializedProperty _fpsThresholdProperty;
 
         private void OnEnable()
         {
+            _enableInReleaseBuildsProperty = serializedObject.FindProperty("_enableInReleaseBuilds");
             _defaultTabIdProperty = serializedObject.FindProperty("_defaultTabId");
             _enabledTabsProperty = serializedObject.FindProperty("_enabledTabs");
 
@@ -40,6 +43,7 @@ namespace Cheats.Editor
             _maximumConsoleEntriesProperty = serializedObject.FindProperty("_maximumConsoleEntries");
             _profilerFpsGraphVisualConfigProperty = serializedObject.FindProperty("_profilerFpsGraphVisualConfig");
             _profilerCpuGraphVisualConfigProperty = serializedObject.FindProperty("_profilerCpuGraphVisualConfig");
+            _profilerMemoryGraphVisualConfigProperty = serializedObject.FindProperty("_profilerMemoryGraphVisualConfig");
             _fpsThresholdProperty = serializedObject.FindProperty("_fpsThreshold");
         }
 
@@ -94,6 +98,11 @@ namespace Cheats.Editor
             {
                 EditorGUILayout.LabelField("General", EditorStyles.boldLabel);
                 EditorGUILayout.PropertyField(
+                    _enableInReleaseBuildsProperty,
+                    new GUIContent(
+                        "Enable In Release Builds",
+                        "Allow cheats in non-development builds. Define SMCHEATS_DISABLED to turn them off everywhere."));
+                EditorGUILayout.PropertyField(
                     _enabledTabsProperty,
                     new GUIContent("Enabled Tabs", "Select which built-in tabs are available in the panel."));
                 DrawDefaultTabField();
@@ -108,7 +117,10 @@ namespace Cheats.Editor
                     new GUIContent("Profiler FPS Graph Visual", "Visual configuration asset used by the FPS profiler graph."));
                 EditorGUILayout.PropertyField(
                     _profilerCpuGraphVisualConfigProperty,
-                    new GUIContent("Profiler Cpu Graph Visual", "Visual configuration asset used by the FPS profiler graph."));
+                    new GUIContent("Profiler Cpu Graph Visual", "Visual configuration asset used by the CPU profiler graph."));
+                EditorGUILayout.PropertyField(
+                    _profilerMemoryGraphVisualConfigProperty,
+                    new GUIContent("Profiler Memory Graph Visual", "Visual configuration asset used by the memory profiler graph."));
             }
         }
 
@@ -335,7 +347,8 @@ namespace Cheats.Editor
 
         private bool HasRequiredProperties()
         {
-            return _defaultTabIdProperty != null &&
+            return _enableInReleaseBuildsProperty != null &&
+                   _defaultTabIdProperty != null &&
                    _enabledTabsProperty != null &&
                    _openMethodsProperty != null &&
                    _keyboardShortcutProperty != null &&

@@ -22,6 +22,44 @@ namespace SMCheats
             return Add(CheatOptionDefinition.Toggle(name, getter, setter, category, sortOrder));
         }
 
+        public CheatOptionDefinition AddValue<T>(
+            string name,
+            Func<T> getter,
+            Action<T> setter,
+            string category,
+            int sortOrder,
+            double? minimumValue = null,
+            double? maximumValue = null,
+            double? step = null)
+        {
+            if (getter == null)
+            {
+                throw new ArgumentNullException(nameof(getter));
+            }
+
+            var option = CheatOptionDefinition
+                .Value(
+                    name,
+                    typeof(T),
+                    () => getter(),
+                    setter == null ? null : value => setter((T)value),
+                    null,
+                    category,
+                    sortOrder)
+                .WithNumericRange(minimumValue, maximumValue, step);
+            return Add(option);
+        }
+
+        public CheatOptionDefinition Add(CheatOptionDefinition option)
+        {
+            if (option == null)
+            {
+                throw new ArgumentNullException(nameof(option));
+            }
+
+            return Add(option, true);
+        }
+
         public void Clear()
         {
             if (_options.Count == 0 && _registeredTargets.Count == 0)
@@ -93,21 +131,11 @@ namespace SMCheats
             return true;
         }
 
-        private CheatOptionDefinition Add(CheatOptionDefinition option, bool notify = true)
+        private CheatOptionDefinition Add(CheatOptionDefinition option, bool notify)
         {
             _options.RemoveAll(x => x.Key == option.Key);
 
-            if (option.SortOrder == 0)
-            {
-                _options.Add(option);
-                if (notify)
-                {
-                    NotifyChanged();
-                }
-
-                return option;
-            }
-
+            // Within a category options are ordered by SortOrder; equal values keep insertion order.
             var inserted = false;
             for (var i = 0; i < _options.Count; i++)
             {

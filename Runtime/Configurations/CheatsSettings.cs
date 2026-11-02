@@ -9,6 +9,10 @@ namespace SMCheats
         public const string ResourcePath = "SMCheats/" + ResourceName;
 
         [SerializeField]
+        [Tooltip("Allow cheats in non-development builds. Define SMCHEATS_DISABLED to turn them off everywhere.")]
+        private bool _enableInReleaseBuilds;
+
+        [SerializeField]
         private string _defaultTabId = CheatsTabUiUtility.Console;
 
         [SerializeField]
@@ -21,7 +25,7 @@ namespace SMCheats
         private CheatsPinCodeSettings _pinCodeSettings = new();
         
         [SerializeField]
-        private Vector2Int _fpsThreshold;
+        private Vector2Int _fpsThreshold = new(50, 30);
         
         [SerializeField]
         private CheatsGraphVisualConfig _profilerFpsGraphVisualConfig;
@@ -40,6 +44,7 @@ namespace SMCheats
         private int _maximumConsoleEntries = 500;
         
 
+        public bool EnableInReleaseBuilds => _enableInReleaseBuilds;
         public string DefaultTabId => string.IsNullOrWhiteSpace(_defaultTabId) ? CheatsTabUiUtility.Console : _defaultTabId;
         public CheatsBuiltInTabs EnabledTabs => _enabledTabs;
         public CheatsUiSettings Ui => _ui ??= new CheatsUiSettings();

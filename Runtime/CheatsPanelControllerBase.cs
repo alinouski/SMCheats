@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SMCheats
 {
-    internal abstract class CheatsPanelControllerBase : ICheatsPanelController
+    public abstract class CheatsPanelControllerBase : ICheatsPanelController
     {
         private ICheatsTabButton _tabButton;
         private GameObject _contentRoot;
@@ -13,7 +13,8 @@ namespace SMCheats
         protected CheatsServiceLocator Services { get; private set; }
         protected ICheatsRuntimeUi RuntimeUi { get; private set; }
         protected ICheatsUiElementFactory UiFactory => Services.Get<ICheatsUiElementFactory>();
-        protected string Title => CheatsTabUiUtility.GetTitle(Id);
+        protected virtual string Title => CheatsTabUiUtility.GetTitle(Id);
+        protected virtual Sprite Icon => UiSettings.TabIcons.GetIcon(BuiltInFlag);
 
         public abstract string Id { get; }
         public abstract int Order { get; }
@@ -150,7 +151,7 @@ namespace SMCheats
 
         protected virtual CheatsButtonView CreateTabButtonView()
         {
-            return UiFactory.CreateTabButton(null, UiSettings.TabIcons.GetIcon(BuiltInFlag), Title);
+            return UiFactory.CreateTabButton(null, Icon, Title);
         }
 
         protected IDisposable RegisterTabButton(CheatsButtonView buttonView)

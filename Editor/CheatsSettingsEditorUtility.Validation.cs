@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Cheats.Editor
+namespace SMCheats.Editor
 {
     public static partial class CheatsSettingsEditorUtility
     {

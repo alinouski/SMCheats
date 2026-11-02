@@ -14,10 +14,19 @@ namespace SMCheats
         private static CheatsSettings Settings => CheatsSettingsProxy.Settings;
         private static bool _isInitialized;
 
+        public static bool IsEnabled { get; private set; }
+
         public static void Init(params ICheatsPanelController[] panelControllers)
         {
             if (_isInitialized)
             {
+                return;
+            }
+
+            IsEnabled = ResolveEnabled();
+            if (!IsEnabled)
+            {
+                _isInitialized = true;
                 return;
             }
 
@@ -28,6 +37,15 @@ namespace SMCheats
             InitializeRuntimeUiForNonReleaseBuild();
 
             _isInitialized = true;
+        }
+
+        private static bool ResolveEnabled()
+        {
+#if SMCHEATS_DISABLED
+            return false;
+#else
+            return Debug.isDebugBuild || Settings.EnableInReleaseBuilds;
+#endif
         }
 
         private static void SetupServices()
@@ -63,13 +81,18 @@ namespace SMCheats
         public static void Show()
         {
             AssertInitialization();
+            if (!IsEnabled)
+            {
+                return;
+            }
+
             _pinCode.RequestAccess(ShowDirect);
         }
         public static void Hide()
         {
             AssertInitialization();
 
-            if (!CheatsController.HasInstance)
+            if (!IsEnabled || !CheatsController.HasInstance)
             {
                 return;
             }
@@ -79,18 +102,58 @@ namespace SMCheats
         public static void RegisterOptions(object target)
         {
             AssertInitialization();
-            _services?.Get<CheatsOptionsService>()?.Register(target);
+            OptionsService?.Register(target);
         }
         public static void UnregisterOptions(object target)
         {
             AssertInitialization();
-            _services?.Get<CheatsOptionsService>()?.Unregister(target);
+            OptionsService?.Unregister(target);
         }
+
+        public static CheatOptionDefinition AddAction(string name, Action callback, string category = null, int sortOrder = 0)
+        {
+            AssertInitialization();
+            return OptionsService?.AddAction(name, callback, category, sortOrder);
+        }
+
+        public static CheatOptionDefinition AddToggle(
+            string name,
+            Func<bool> getter,
+            Action<bool> setter,
+            string category = null,
+            int sortOrder = 0)
+        {
+            AssertInitialization();
+            return OptionsService?.AddToggle(name, getter, setter, category, sortOrder);
+        }
+
+        public static CheatOptionDefinition AddValue<T>(
+            string name,
+            Func<T> getter,
+            Action<T> setter = null,
+            string category = null,
+            int sortOrder = 0,
+            double? minimumValue = null,
+            double? maximumValue = null,
+            double? step = null)
+        {
+            AssertInitialization();
+            return OptionsService?.AddValue(name, getter, setter, category, sortOrder, minimumValue, maximumValue, step);
+        }
+
+        public static bool RemoveOption(CheatOptionDefinition option)
+        {
+            AssertInitialization();
+            return OptionsService?.Remove(option) ?? false;
+        }
+
+        private static CheatsOptionsService OptionsService => _services?.Get<CheatsOptionsService>();
+
         public static void SetActiveTriggerListener(bool active)
         {
             AssertInitialization();
             
-            if (!active && _triggerListener == null)
+            if (_triggerListener == null)
             {
                 return;
             }
@@ -144,6 +207,7 @@ namespace SMCheats
             _triggerListener = null;
             _pinCode = null;
             _isInitialized = false;
+            IsEnabled = false;
         }
 
         private static void AssertInitialization([CallerMemberName] string callerMemberName = "")
