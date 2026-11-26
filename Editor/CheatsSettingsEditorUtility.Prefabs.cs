@@ -316,16 +316,15 @@ namespace SMCheats.Editor
         private static void BuildProfilerPanelContent(GameObject root, RectTransform contentRoot, Font runtimeFont)
         {
             var view = root.AddComponent<global::SMCheats.CheatsProfilerPanelView>();
+            var layout = contentRoot.gameObject.AddComponent<VerticalLayoutGroup>();
+            layout.padding = new RectOffset(8, 8, 8, 8);
+            layout.spacing = 12f;
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
+            layout.childForceExpandWidth = true;
+            layout.childForceExpandHeight = true;
             var fpsGraphView = InstantiateProfilerGraphView(contentRoot, runtimeFont);
             var cpuGraphView = InstantiateProfilerGraphView(contentRoot, runtimeFont);
-            fpsGraphView.Root.anchorMin = new Vector2(0f, 0.5f);
-            fpsGraphView.Root.anchorMax = Vector2.one;
-            fpsGraphView.Root.offsetMin = new Vector2(8f, 8f);
-            fpsGraphView.Root.offsetMax = new Vector2(-8f, -8f);
-            cpuGraphView.Root.anchorMin = Vector2.zero;
-            cpuGraphView.Root.anchorMax = new Vector2(1f, 0.5f);
-            cpuGraphView.Root.offsetMin = new Vector2(8f, 8f);
-            cpuGraphView.Root.offsetMax = new Vector2(-8f, -8f);
 
             var serializedObject = new SerializedObject(view);
             serializedObject.FindProperty("_fpsGraph").objectReferenceValue = fpsGraphView;
@@ -372,10 +371,13 @@ namespace SMCheats.Editor
             rootRect.pivot = new Vector2(0f, 1f);
             rootRect.anchoredPosition = new Vector2(16f, -16f);
             rootRect.sizeDelta = new Vector2(480f, 280f);
+            var layoutElement = root.AddComponent<LayoutElement>();
+            layoutElement.minHeight = 96f;
+            layoutElement.flexibleHeight = 1f;
             var mover = root.AddComponent<global::SMCheats.CheatsMovableResizableRect>();
             mover.enabled = false;
             var moverSettings = new SerializedObject(mover);
-            moverSettings.FindProperty("_minimumSize").vector2Value = rootRect.sizeDelta;
+            moverSettings.FindProperty("_minimumSize").vector2Value = new Vector2(160f, 96f);
             moverSettings.ApplyModifiedPropertiesWithoutUndo();
 
             var background = CreateProfilerGraphBackground(root.transform);
@@ -406,12 +408,19 @@ namespace SMCheats.Editor
             valuesRoot.offsetMin = new Vector2(72f, 8f);
             valuesRoot.offsetMax = new Vector2(-8f, -8f);
             var valuesLayout = valuesObject.GetComponent<GridLayoutGroup>();
-            valuesLayout.cellSize = new Vector2(100f, 48f);
+            valuesLayout.cellSize = new Vector2(100f, 40f);
             valuesLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             valuesLayout.constraintCount = 4;
 
             var valueRowTemplate = CreateProfilerGraphValueRow(valuesRoot, runtimeFont);
             valueRowTemplate.SetActive(false);
+
+            var averageText = CreateText("Average", headerRoot.transform, string.Empty, runtimeFont, 18, TextAnchor.MiddleLeft);
+            Stretch(averageText.rectTransform);
+            averageText.rectTransform.offsetMin = new Vector2(72f, 8f);
+            averageText.rectTransform.offsetMax = new Vector2(-8f, -8f);
+            averageText.raycastTarget = false;
+            averageText.gameObject.SetActive(false);
 
             var graphView = root.GetComponent<global::SMCheats.CheatsGraphView>();
             var serializedObject = new SerializedObject(graphView);
@@ -422,6 +431,8 @@ namespace SMCheats.Editor
             serializedObject.FindProperty("_currentValueRowTemplate").objectReferenceValue = valueRowTemplate;
             serializedObject.FindProperty("_headerRect").objectReferenceValue = headerRect;
             serializedObject.FindProperty("_currentValuesLayout").objectReferenceValue = valuesLayout;
+            serializedObject.FindProperty("_averageText").objectReferenceValue = averageText;
+            serializedObject.FindProperty("_averageValueIndex").intValue = 2;
             var pinnedComponents = serializedObject.FindProperty("_componentForPinnedScreen");
             pinnedComponents.arraySize = 1;
             pinnedComponents.GetArrayElementAtIndex(0).objectReferenceValue = mover;
@@ -444,7 +455,6 @@ namespace SMCheats.Editor
             var background = backgroundRoot.GetComponent<Image>();
             background.color = Color.clear;
             background.raycastTarget = false;
-            background.gameObject.SetActive(false);
             return background;
         }
 
@@ -479,7 +489,7 @@ namespace SMCheats.Editor
             labelRect.anchorMax = new Vector2(1f, 1f);
             labelRect.pivot = new Vector2(0.5f, 1f);
             labelRect.anchoredPosition = Vector2.zero;
-            labelRect.sizeDelta = new Vector2(0f, 27f);
+            labelRect.sizeDelta = new Vector2(0f, 20f);
 
             var value = CreateText("Value", row.transform, string.Empty, runtimeFont, 16, TextAnchor.MiddleCenter);
             var valueRect = (RectTransform)value.transform;
@@ -487,7 +497,7 @@ namespace SMCheats.Editor
             valueRect.anchorMax = new Vector2(1f, 0f);
             valueRect.pivot = new Vector2(0.5f, 0f);
             valueRect.anchoredPosition = Vector2.zero;
-            valueRect.sizeDelta = new Vector2(0f, 21f);
+            valueRect.sizeDelta = new Vector2(0f, 20f);
             value.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
 
             return row;

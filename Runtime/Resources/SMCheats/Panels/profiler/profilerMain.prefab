@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4816538844036332523}
   - component: {fileID: 396860980501095693}
   - component: {fileID: 7447881379337650113}
+  - component: {fileID: 3056081726424986354}
   m_Layer: 0
   m_Name: profilerMain
   m_TagString: Untagged
@@ -106,6 +107,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: SMCheats.Runtime::SMCheats.CheatsProfilerPanelView
   _fpsGraph: {fileID: 4807886221767795304}
   _cpuGraph: {fileID: 2633951753805236889}
+--- !u!114 &3056081726424986354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2278142384021030353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: ""
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
+  m_Padding:
+    m_Left: 8
+    m_Right: 8
+    m_Top: 8
+    m_Bottom: 8
+  m_ChildAlignment: 0
+  m_Spacing: 12
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1001 &66461305111994626
 PrefabInstance:
   m_ObjectHideFlags: 0
