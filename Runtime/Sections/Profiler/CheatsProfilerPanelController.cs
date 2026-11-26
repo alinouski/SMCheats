@@ -192,7 +192,38 @@ namespace SMCheats
 
         private CheatsGraphView CreatePinnedGraphView()
         {
-            return UiFactory.InstantiatePrefabView<CheatsGraphView>(CheatsPrefabResourcePaths.ProfilerGraph, RuntimeUi.PinnedContentRoot);
+            var parent = RuntimeUi.PinnedContentRoot;
+            var view = UiFactory.InstantiatePrefabView<CheatsGraphView>(CheatsPrefabResourcePaths.ProfilerGraph, parent);
+            var size = view.Root.rect.size;
+            var columns = Mathf.Max(1, Mathf.FloorToInt((parent.rect.width - 16f) / (size.x + 16f)));
+            for (var slot = 0; slot < parent.childCount; slot++)
+            {
+                var position = new Vector2(16f + slot % columns * (size.x + 16f), -16f - slot / columns * (size.y + 16f));
+                var candidate = new Rect(position.x, -position.y, size.x, size.y);
+                var occupied = false;
+                for (var i = 0; i < parent.childCount; i++)
+                {
+                    var child = parent.GetChild(i);
+                    if (child == view.transform || !child.TryGetComponent<CheatsGraphView>(out var graph))
+                    {
+                        continue;
+                    }
+
+                    var childPosition = graph.Root.anchoredPosition;
+                    var bounds = new Rect(childPosition.x, -childPosition.y, graph.Root.rect.width, graph.Root.rect.height);
+                    occupied |= candidate.Overlaps(bounds);
+                }
+
+                if (occupied)
+                {
+                    continue;
+                }
+
+                view.Root.anchoredPosition = position;
+                break;
+            }
+
+            return view;
         }
 
         private void TogglePinMode()

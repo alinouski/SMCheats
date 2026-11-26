@@ -7,13 +7,17 @@ using UnityEngine.UI;
 namespace SMCheats
 {
     [DisallowMultipleComponent]
-    public sealed class CheatsGraphView : MonoBehaviour, ICheatsViewElement, IPointerClickHandler
+    public sealed class CheatsGraphView : MonoBehaviour, ICheatsViewElement, IPointerClickHandler, ILayoutController
     {
         [SerializeField] private Graphic _background;
         [SerializeField] private CheatsGraphGraphicView _graph;
         [SerializeField] private Text _titleText;
         [SerializeField] private RectTransform _currentValuesRoot;
         [SerializeField] private CheatsGraphRowView _currentValueRowTemplate;
+        [SerializeField]
+        private RectTransform _headerRect;
+        [SerializeField]
+        private GridLayoutGroup _currentValuesLayout;
         [SerializeField] private List<MonoBehaviour> _componentForPinnedScreen = new();
 
         [SerializeField]
@@ -47,6 +51,31 @@ namespace SMCheats
             RefreshTitle();
             RebuildCurrentValueRows();
             RefreshCurrentValues();
+            LayoutRebuilder.MarkLayoutForRebuild(Root);
+        }
+
+        public void SetLayoutHorizontal()
+        {
+            var valuesWidth = _currentValuesRoot.rect.width;
+            var columns = Mathf.Max(1, Mathf.FloorToInt(valuesWidth / 100f));
+            var valueCount = _instantiatedCurrentValueRows.Count;
+            var rows = Mathf.Max(1, Mathf.CeilToInt(valueCount / (float)columns));
+            columns = Mathf.Max(1, Mathf.CeilToInt(valueCount / (float)rows));
+            _currentValuesLayout.constraintCount = columns;
+            _currentValuesLayout.cellSize = new Vector2(valuesWidth / columns, 48f);
+
+            var headerHeight = rows * 48f + 16f;
+            _headerRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, headerHeight);
+            Graph.rectTransform.offsetMin = new Vector2(0f, headerHeight);
+        }
+
+        public void SetLayoutVertical()
+        {
+        }
+
+        private void OnRectTransformDimensionsChange()
+        {
+            LayoutRebuilder.MarkLayoutForRebuild(Root);
         }
 
         public void Refresh()

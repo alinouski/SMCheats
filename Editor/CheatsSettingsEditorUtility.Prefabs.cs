@@ -318,6 +318,14 @@ namespace SMCheats.Editor
             var view = root.AddComponent<global::SMCheats.CheatsProfilerPanelView>();
             var fpsGraphView = InstantiateProfilerGraphView(contentRoot, runtimeFont);
             var cpuGraphView = InstantiateProfilerGraphView(contentRoot, runtimeFont);
+            fpsGraphView.Root.anchorMin = new Vector2(0f, 0.5f);
+            fpsGraphView.Root.anchorMax = Vector2.one;
+            fpsGraphView.Root.offsetMin = new Vector2(8f, 8f);
+            fpsGraphView.Root.offsetMax = new Vector2(-8f, -8f);
+            cpuGraphView.Root.anchorMin = Vector2.zero;
+            cpuGraphView.Root.anchorMax = new Vector2(1f, 0.5f);
+            cpuGraphView.Root.offsetMin = new Vector2(8f, 8f);
+            cpuGraphView.Root.offsetMax = new Vector2(-8f, -8f);
 
             var serializedObject = new SerializedObject(view);
             serializedObject.FindProperty("_fpsGraph").objectReferenceValue = fpsGraphView;
@@ -359,7 +367,16 @@ namespace SMCheats.Editor
                 typeof(RectTransform),
                 typeof(global::SMCheats.CheatsGraphView));
             root.transform.localScale = Vector3.one;
-            Stretch(root.GetComponent<RectTransform>());
+            var rootRect = root.GetComponent<RectTransform>();
+            rootRect.anchorMin = rootRect.anchorMax = new Vector2(0f, 1f);
+            rootRect.pivot = new Vector2(0f, 1f);
+            rootRect.anchoredPosition = new Vector2(16f, -16f);
+            rootRect.sizeDelta = new Vector2(480f, 280f);
+            var mover = root.AddComponent<global::SMCheats.CheatsMovableResizableRect>();
+            mover.enabled = false;
+            var moverSettings = new SerializedObject(mover);
+            moverSettings.FindProperty("_minimumSize").vector2Value = rootRect.sizeDelta;
+            moverSettings.ApplyModifiedPropertiesWithoutUndo();
 
             var background = CreateProfilerGraphBackground(root.transform);
             var graphGraphic = CreateProfilerGraphGraphic(root.transform);
@@ -369,24 +386,29 @@ namespace SMCheats.Editor
             headerRoot.transform.localScale = Vector3.one;
             headerRoot.GetComponent<Image>().color = new Color(0.16f, 0.18f, 0.22f, 0.92f);
             var headerRect = headerRoot.GetComponent<RectTransform>();
-            headerRect.anchorMin = new Vector2(0f, 1f);
-            headerRect.anchorMax = new Vector2(1f, 1f);
-            headerRect.pivot = new Vector2(0.5f, 1f);
+            headerRect.anchorMin = Vector2.zero;
+            headerRect.anchorMax = new Vector2(1f, 0f);
+            headerRect.pivot = new Vector2(0.5f, 0f);
             headerRect.anchoredPosition = Vector2.zero;
-            headerRect.sizeDelta = new Vector2(0f, 76f);
+            headerRect.sizeDelta = new Vector2(0f, 64f);
 
-            var titleText = CreateText("Label", headerRoot.transform, "FPS", runtimeFont, 16, TextAnchor.MiddleCenter);
+            var titleText = CreateText("Label", headerRoot.transform, "FPS", runtimeFont, 18, TextAnchor.MiddleCenter);
             var titleRect = (RectTransform)titleText.transform;
             titleRect.anchorMin = new Vector2(0f, 0f);
-            titleRect.anchorMax = new Vector2(0.08f, 1f);
-            titleRect.offsetMin = new Vector2(10f, 10f);
-            titleRect.offsetMax = new Vector2(-2f, -10f);
+            titleRect.anchorMax = new Vector2(0f, 1f);
+            titleRect.offsetMin = new Vector2(8f, 8f);
+            titleRect.offsetMax = new Vector2(64f, -8f);
 
-            var valuesRoot = CreateLayoutRoot("GraphValues", headerRoot.transform, false, 0f, new RectOffset(0, 0, 0, 0));
-            valuesRoot.anchorMin = new Vector2(0.08f, 0f);
-            valuesRoot.anchorMax = new Vector2(1f, 1f);
-            valuesRoot.offsetMin = new Vector2(14f, 0f);
-            valuesRoot.offsetMax = Vector2.zero;
+            var valuesObject = new GameObject("GraphValues", typeof(RectTransform), typeof(GridLayoutGroup));
+            valuesObject.transform.SetParent(headerRoot.transform, false);
+            var valuesRoot = valuesObject.GetComponent<RectTransform>();
+            Stretch(valuesRoot);
+            valuesRoot.offsetMin = new Vector2(72f, 8f);
+            valuesRoot.offsetMax = new Vector2(-8f, -8f);
+            var valuesLayout = valuesObject.GetComponent<GridLayoutGroup>();
+            valuesLayout.cellSize = new Vector2(100f, 48f);
+            valuesLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            valuesLayout.constraintCount = 4;
 
             var valueRowTemplate = CreateProfilerGraphValueRow(valuesRoot, runtimeFont);
             valueRowTemplate.SetActive(false);
@@ -398,6 +420,11 @@ namespace SMCheats.Editor
             serializedObject.FindProperty("_titleText").objectReferenceValue = titleText;
             serializedObject.FindProperty("_currentValuesRoot").objectReferenceValue = valuesRoot;
             serializedObject.FindProperty("_currentValueRowTemplate").objectReferenceValue = valueRowTemplate;
+            serializedObject.FindProperty("_headerRect").objectReferenceValue = headerRect;
+            serializedObject.FindProperty("_currentValuesLayout").objectReferenceValue = valuesLayout;
+            var pinnedComponents = serializedObject.FindProperty("_componentForPinnedScreen");
+            pinnedComponents.arraySize = 1;
+            pinnedComponents.GetArrayElementAtIndex(0).objectReferenceValue = mover;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
 
             return root;
@@ -446,7 +473,7 @@ namespace SMCheats.Editor
             layout.minWidth = 50f;
             layout.preferredWidth = 100f;
 
-            var label = CreateText("Label", row.transform, "Value", runtimeFont, 15, TextAnchor.MiddleCenter);
+            var label = CreateText("Label", row.transform, "Value", runtimeFont, 16, TextAnchor.MiddleCenter);
             var labelRect = (RectTransform)label.transform;
             labelRect.anchorMin = new Vector2(0f, 1f);
             labelRect.anchorMax = new Vector2(1f, 1f);
@@ -454,13 +481,13 @@ namespace SMCheats.Editor
             labelRect.anchoredPosition = Vector2.zero;
             labelRect.sizeDelta = new Vector2(0f, 27f);
 
-            var value = CreateText("Value", row.transform, string.Empty, runtimeFont, 15, TextAnchor.MiddleCenter);
+            var value = CreateText("Value", row.transform, string.Empty, runtimeFont, 16, TextAnchor.MiddleCenter);
             var valueRect = (RectTransform)value.transform;
             valueRect.anchorMin = new Vector2(0f, 0f);
             valueRect.anchorMax = new Vector2(1f, 0f);
             valueRect.pivot = new Vector2(0.5f, 0f);
             valueRect.anchoredPosition = Vector2.zero;
-            valueRect.sizeDelta = new Vector2(0f, 50f);
+            valueRect.sizeDelta = new Vector2(0f, 21f);
             value.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
 
             return row;
