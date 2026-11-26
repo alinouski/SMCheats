@@ -11,5 +11,10 @@ namespace SMCheats
 
         public Button ToggleButton => _toggleButton;
         public Image ToggleButtonIcon => _toggleButtonIcon;
+
+        protected override float CalculatePreferredWidth()
+        {
+            return TitleText.preferredWidth + 56f;
+        }
     }
 }

@@ -24,7 +24,7 @@ namespace SMCheats.Editor
 
             var canvasScaler = root.GetComponent<CanvasScaler>();
             canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            canvasScaler.referenceResolution = new Vector2(1920f, 1080f);
+            canvasScaler.referenceResolution = new Vector2(1280f, 720f);
             canvasScaler.matchWidthOrHeight = 0.5f;
 
             var rootRect = root.GetComponent<RectTransform>();
@@ -101,7 +101,7 @@ namespace SMCheats.Editor
 
             var canvasScaler = root.GetComponent<CanvasScaler>();
             canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            canvasScaler.referenceResolution = new Vector2(1920f, 1080f);
+            canvasScaler.referenceResolution = new Vector2(1280f, 720f);
             canvasScaler.matchWidthOrHeight = 0.5f;
 
             var rootRect = root.GetComponent<RectTransform>();
@@ -155,7 +155,7 @@ namespace SMCheats.Editor
 
             var canvasScaler = root.GetComponent<CanvasScaler>();
             canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            canvasScaler.referenceResolution = new Vector2(1920f, 1080f);
+            canvasScaler.referenceResolution = new Vector2(1280f, 720f);
             canvasScaler.matchWidthOrHeight = 0.5f;
 
             var rootRect = root.GetComponent<RectTransform>();
@@ -503,12 +503,40 @@ namespace SMCheats.Editor
 
         private static GameObject BuildToggleOptionControlPrefab(Font runtimeFont)
         {
-            var root = CreateOptionControlRoot<global::SMCheats.CheatsToggleOptionView>("ToggleOption", runtimeFont, out var view, out _, out var controlRoot, out _, out _);
-            var toggleButton = CreateButton("Off", controlRoot, runtimeFont, out var toggleButtonLabel);
+            var root = new GameObject(
+                "ToggleOption", typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement),
+                typeof(global::SMCheats.CheatsToggleOptionView));
+            var view = root.GetComponent<global::SMCheats.CheatsToggleOptionView>();
+            var background = root.GetComponent<Image>();
+            background.color = new Color(0f, 0f, 0f, 0.16f);
+            var selectionButton = root.GetComponent<Button>();
+            selectionButton.targetGraphic = background;
+            var layout = root.GetComponent<LayoutElement>();
+            layout.minHeight = 50f;
+            layout.preferredHeight = 60f;
+
+            var toggleButton = CreateButton("Off", root.transform, runtimeFont, out var titleText);
+            Stretch((RectTransform)toggleButton.transform);
+            titleText.alignment = TextAnchor.MiddleLeft;
+            titleText.rectTransform.offsetMin = new Vector2(8f, 4f);
+            titleText.rectTransform.offsetMax = new Vector2(-48f, -4f);
+
+            var iconRoot = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+            iconRoot.transform.SetParent(toggleButton.transform, false);
+            var iconRect = iconRoot.GetComponent<RectTransform>();
+            iconRect.anchorMin = new Vector2(1f, 0.5f);
+            iconRect.anchorMax = new Vector2(1f, 0.5f);
+            iconRect.anchoredPosition = new Vector2(-24f, 0f);
+            iconRect.sizeDelta = new Vector2(32f, 32f);
+            iconRect.localRotation = Quaternion.Euler(0f, 0f, 90f);
+            var icon = iconRoot.GetComponent<Image>();
+            icon.raycastTarget = false;
+            icon.preserveAspect = true;
+            AssignOptionControlBaseReferences(view, titleText, background, selectionButton);
 
             var serializedObject = new SerializedObject(view);
             serializedObject.FindProperty("_toggleButton").objectReferenceValue = toggleButton;
-            serializedObject.FindProperty("_toggleButtonLabel").objectReferenceValue = toggleButtonLabel;
+            serializedObject.FindProperty("_toggleButtonIcon").objectReferenceValue = icon;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
             return root;
         }
@@ -947,6 +975,13 @@ namespace SMCheats.Editor
             titleRect.sizeDelta = new Vector2(-24f, 0f);
 
             headerActionsRoot = CreateLayoutRoot("HeaderActions", parent, false, 8f, new RectOffset(0, 0, 0, 0));
+            var headerLayout = headerActionsRoot.GetComponent<HorizontalLayoutGroup>();
+            headerLayout.childControlWidth = true;
+            headerLayout.childControlHeight = true;
+            headerLayout.childForceExpandHeight = true;
+            var headerFitter = headerActionsRoot.GetComponent<ContentSizeFitter>();
+            headerFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            headerFitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
             headerActionsRoot.anchorMin = new Vector2(1f, 0f);
             headerActionsRoot.anchorMax = new Vector2(1f, 1f);
             headerActionsRoot.pivot = new Vector2(1f, 0.5f);
@@ -1256,6 +1291,7 @@ namespace SMCheats.Editor
             var layout = root.GetComponent<LayoutElement>();
             layout.preferredHeight = 40f;
             layout.minWidth = 40f;
+            layout.minHeight = 0f;
             layout.preferredWidth = 40f;
 
             var iconRoot = new GameObject("Icon", typeof(RectTransform), typeof(Image));
