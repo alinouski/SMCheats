@@ -6,7 +6,9 @@ namespace SMCheats
 {
     internal sealed class CheatsOptionsPanelController : CheatsPanelControllerBase
     {
+        private readonly HashSet<string> _expandedOptionCategoryKeys = new(StringComparer.Ordinal);
         private readonly HashSet<string> _validOptionKeys = new(StringComparer.Ordinal);
+        private readonly HashSet<string> _validCategories = new(StringComparer.Ordinal);
         private readonly List<string> _visibleOptionKeys = new();
         private readonly List<string> _visibleOptionKeyScratch = new();
         private readonly List<string> _categoryOptionKeys = new();
@@ -86,7 +88,9 @@ namespace SMCheats
                 _visibleOptionKeys.Clear();
                 _visibleOptionKeyScratch.Clear();
                 _categoryOptionKeys.Clear();
+                _expandedOptionCategoryKeys.Clear();
                 _validOptionKeys.Clear();
+                _validCategories.Clear();
                 _mainContentRoot = null;
                 _pinnedContentRoot = null;
                 DestroyRoot(mainRoot);
@@ -145,12 +149,18 @@ namespace SMCheats
                 var category = categories[i];
                 var categoryName = category.Category;
                 var isCategoryPinned = IsOptionCategoryPinned(categoryName);
+                var isExpanded = IsPinModeActive || _expandedOptionCategoryKeys.Contains(categoryName);
                 var categoryView = _uiPool.GetCategory(categoryName, parent);
-                categoryView.Initialize(BuildCategoryHeaderTitle(categoryName), IsPinModeActive && isCategoryPinned, true);
+                categoryView.Initialize(BuildCategoryHeaderTitle(categoryName), IsPinModeActive && isCategoryPinned, isExpanded);
 
-                categoryView.HeaderButton.Button.interactable = IsPinModeActive;
+                categoryView.HeaderButton.Button.interactable = true;
                 categoryView.HeaderButton.Button.onClick.RemoveAllListeners();
                 categoryView.HeaderButton.Button.onClick.AddListener(() => HandleCategorySelected(categoryName));
+
+                if (!isExpanded)
+                {
+                    continue;
+                }
 
                 var options = category.Options;
                 for (var optionIndex = 0; optionIndex < options.Count; optionIndex++)
@@ -198,7 +208,15 @@ namespace SMCheats
             if (IsPinModeActive)
             {
                 ToggleOptionCategoryPin(category);
+                return;
             }
+
+            if (!_expandedOptionCategoryKeys.Add(category))
+            {
+                _expandedOptionCategoryKeys.Remove(category);
+            }
+
+            RefreshOptionsContent();
         }
 
         private bool IsOptionPinned(CheatOptionDefinition option)
@@ -271,14 +289,17 @@ namespace SMCheats
         private void CleanupPinnedState()
         {
             _validOptionKeys.Clear();
+            _validCategories.Clear();
             var options = _optionsService.Options;
             for (var i = 0; i < options.Count; i++)
             {
                 var option = options[i];
                 _validOptionKeys.Add(CheatsTabUiUtility.GetOptionKey(option));
+                _validCategories.Add(option.Category);
             }
 
             RemovePinnedKeysWhere(optionKey => !_validOptionKeys.Contains(optionKey), false);
+            _expandedOptionCategoryKeys.RemoveWhere(category => !_validCategories.Contains(category));
         }
 
         private static string BuildCategoryHeaderTitle(string category)
