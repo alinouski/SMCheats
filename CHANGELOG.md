@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.7
+
+- Align unpinned profiler graphs and show their backgrounds.
+- Allow pinned graphs to shrink to 160x96 UI units, showing only the average when space is limited.
+- Toggle full statistics and the average value by tapping the statistics panel.
+
 ## 0.2.6
 
 - Guard exception indicator callbacks during Play Mode shutdown.
