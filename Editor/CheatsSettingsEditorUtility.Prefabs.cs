@@ -787,7 +787,8 @@ namespace SMCheats.Editor
 
         private static Dropdown CreateDropdown(Transform parent, Font runtimeFont)
         {
-            var root = new GameObject("Dropdown", typeof(RectTransform), typeof(Image), typeof(Dropdown), typeof(LayoutElement));
+            var root = new GameObject(
+                "Dropdown", typeof(RectTransform), typeof(Image), typeof(global::SMCheats.CheatsDropdown), typeof(LayoutElement));
             root.transform.SetParent(parent, false);
             root.transform.localScale = Vector3.one;
             root.GetComponent<Image>().color = new Color(0.14f, 0.15f, 0.18f, 1f);
@@ -829,7 +830,7 @@ namespace SMCheats.Editor
             viewport.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.05f);
             viewport.GetComponent<Mask>().showMaskGraphic = false;
 
-            var content = new GameObject("Content", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
+            var content = new GameObject("Content", typeof(RectTransform));
             content.transform.SetParent(viewport.transform, false);
             content.transform.localScale = Vector3.one;
             var contentRect = content.GetComponent<RectTransform>();
@@ -837,22 +838,22 @@ namespace SMCheats.Editor
             contentRect.anchorMax = new Vector2(1f, 1f);
             contentRect.pivot = new Vector2(0.5f, 1f);
             contentRect.anchoredPosition = Vector2.zero;
-            contentRect.sizeDelta = Vector2.zero;
-            var contentLayout = content.GetComponent<VerticalLayoutGroup>();
-            contentLayout.childControlHeight = false;
-            contentLayout.childControlWidth = true;
-            contentLayout.childForceExpandHeight = false;
-            contentLayout.childForceExpandWidth = true;
-            contentLayout.spacing = 2f;
-            content.GetComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            contentRect.sizeDelta = new Vector2(0f, 40f);
 
             var item = new GameObject("Item", typeof(RectTransform), typeof(Image), typeof(Toggle), typeof(LayoutElement));
             item.transform.SetParent(content.transform, false);
             item.transform.localScale = Vector3.one;
+            var itemRect = item.GetComponent<RectTransform>();
+            itemRect.anchorMin = new Vector2(0f, 0.5f);
+            itemRect.anchorMax = new Vector2(1f, 0.5f);
+            itemRect.sizeDelta = new Vector2(0f, 32f);
             item.GetComponent<Image>().color = new Color(0.18f, 0.2f, 0.24f, 1f);
             item.GetComponent<LayoutElement>().preferredHeight = 32f;
             var itemLabel = CreateText("Item Label", item.transform, "Option", runtimeFont, 15, TextAnchor.MiddleLeft);
-            Stretch((RectTransform)itemLabel.transform, 10f);
+            var itemLabelRect = itemLabel.rectTransform;
+            Stretch(itemLabelRect);
+            itemLabelRect.offsetMin = new Vector2(8f, 4f);
+            itemLabelRect.offsetMax = new Vector2(-8f, -4f);
 
             var toggle = item.GetComponent<Toggle>();
             toggle.targetGraphic = item.GetComponent<Image>();
