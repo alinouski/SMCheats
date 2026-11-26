@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace SMCheats
@@ -42,7 +43,10 @@ namespace SMCheats
         private static void RefreshDropdownView(Dropdown dropdown, CheatValueOptionData valueData, DropdownBindingState state)
         {
             FillDropdownLabels(valueData, state);
-            SyncDropdownOptions(dropdown, state.Labels);
+            if (SyncDropdownOptions(dropdown, state.Labels))
+            {
+                LayoutRebuilder.MarkLayoutForRebuild((RectTransform)dropdown.transform);
+            }
 
             var selectedIndex = GetSelectedDropdownIndex(valueData, state);
             dropdown.SetValueWithoutNotify(selectedIndex);
@@ -79,7 +83,7 @@ namespace SMCheats
             }
         }
 
-        private static void SyncDropdownOptions(Dropdown dropdown, List<string> labels)
+        private static bool SyncDropdownOptions(Dropdown dropdown, List<string> labels)
         {
             if (dropdown.options.Count != labels.Count)
             {
@@ -89,13 +93,17 @@ namespace SMCheats
                     dropdown.options.Add(new Dropdown.OptionData(labels[i]));
                 }
 
-                return;
+                return true;
             }
 
+            var changed = false;
             for (var i = 0; i < labels.Count; i++)
             {
+                changed |= !string.Equals(dropdown.options[i].text, labels[i], StringComparison.Ordinal);
                 dropdown.options[i].text = labels[i];
             }
+
+            return changed;
         }
 
         private static string[] GetEnumLabels(Type enumType)

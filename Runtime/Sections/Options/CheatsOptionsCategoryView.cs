@@ -47,7 +47,7 @@ namespace SMCheats
 
         public void CalculateLayoutInputVertical()
         {
-            var headerHeight = GetElementPreferredSize(GetHeaderRoot(), 1);
+            var headerHeight = GetHeaderHeight();
             var contentHeight = GetElementPreferredSize(_contentRoot, 1);
             _preferredHeight = headerHeight + contentHeight;
             if (headerHeight > 0f && contentHeight > 0f)
@@ -63,7 +63,7 @@ namespace SMCheats
 
         public void SetLayoutVertical()
         {
-            var y = GetElementPreferredSize(GetHeaderRoot(), 1);
+            var y = GetHeaderHeight();
             var contentHeight = GetElementPreferredSize(_contentRoot, 1);
             if (y > 0f && contentHeight > 0f)
             {
@@ -76,6 +76,12 @@ namespace SMCheats
         private RectTransform GetHeaderRoot()
         {
             return _headerButton.Root;
+        }
+
+        private float GetHeaderHeight()
+        {
+            var header = GetHeaderRoot();
+            return Mathf.Max(header.rect.height, GetElementPreferredSize(header, 1));
         }
 
         private float GetContentRootPreferredWidth()

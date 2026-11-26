@@ -57,6 +57,7 @@ namespace SMCheats.Editor
             {
                 var existingColorSettings = CreateColorSettingsAssetIfMissing();
                 AssignColorSettings(existingSettings, existingColorSettings);
+                AssignDefaultIcons(existingSettings);
                 AssetDatabase.SaveAssets();
                 SelectSettingsAsset(existingSettings);
                 return;
@@ -72,6 +73,7 @@ namespace SMCheats.Editor
             var settings = ScriptableObject.CreateInstance<SMCheats.CheatsSettings>();
             AssetDatabase.CreateAsset(settings, DefaultSettingsAssetPath);
             AssignColorSettings(settings, colorSettings);
+            AssignDefaultIcons(settings);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
@@ -138,6 +140,27 @@ namespace SMCheats.Editor
             }
 
             colorProperty.objectReferenceValue = colorSettings;
+            serializedSettings.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void AssignDefaultIcons(global::SMCheats.CheatsSettings settings)
+        {
+            var serializedSettings = new SerializedObject(settings);
+            var uiProperty = serializedSettings.FindProperty("_ui");
+            var tabIconsProperty = uiProperty.FindPropertyRelative("_tabIcons");
+            var ui = settings.Ui;
+            tabIconsProperty.FindPropertyRelative("_info").objectReferenceValue = ui.TabIcons.Info;
+            tabIconsProperty.FindPropertyRelative("_console").objectReferenceValue = ui.TabIcons.Console;
+            tabIconsProperty.FindPropertyRelative("_profiler").objectReferenceValue = ui.TabIcons.Profiler;
+            tabIconsProperty.FindPropertyRelative("_options").objectReferenceValue = ui.TabIcons.Options;
+            uiProperty.FindPropertyRelative("_toggleActiveIcon").objectReferenceValue = ui.ToggleActiveIcon;
+            uiProperty.FindPropertyRelative("_toggleInactiveIcon").objectReferenceValue = ui.ToggleInactiveIcon;
+            uiProperty.FindPropertyRelative("_updateIcon").objectReferenceValue = ui.UpdateIcon;
+            uiProperty.FindPropertyRelative("_clearIcon").objectReferenceValue = ui.ClearIcon;
+            uiProperty.FindPropertyRelative("_searchIcon").objectReferenceValue = ui.SearchIcon;
+            uiProperty.FindPropertyRelative("_openCheatsIcon").objectReferenceValue = ui.OpenCheatsIcon;
+            uiProperty.FindPropertyRelative("_pinnedConsoleExpandedIcon").objectReferenceValue = ui.PinnedConsoleExpandedIcon;
+            uiProperty.FindPropertyRelative("_pinnedConsoleCollapsedIcon").objectReferenceValue = ui.PinnedConsoleCollapsedIcon;
             serializedSettings.ApplyModifiedPropertiesWithoutUndo();
         }
 

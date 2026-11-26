@@ -165,8 +165,8 @@ MonoBehaviour:
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 1
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "\u25BC"
 --- !u!1 &1911739841437761644
@@ -244,8 +244,8 @@ MonoBehaviour:
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 1
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Option
 --- !u!1 &5061026725653817825
@@ -431,8 +431,8 @@ MonoBehaviour:
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 1
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Option
 --- !u!114 &201819459810231931
@@ -748,6 +748,7 @@ GameObject:
   - component: {fileID: 617155392975057359}
   - component: {fileID: 2367013386767334010}
   - component: {fileID: 7844304105806275992}
+  - component: {fileID: 8742157621161431278}
   m_Layer: 0
   m_Name: Dropdown
   m_TagString: Untagged
@@ -888,6 +889,19 @@ MonoBehaviour:
   m_FlexibleWidth: 2
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &8742157621161431278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7788080843506302498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5023b183ef704bb79c9a089f3e1b39bf, type: 3}
+  m_Name: ""
+  m_EditorClassIdentifier: SMCheats.Runtime::SMCheats.CheatsDropdownLayoutElement
+  _dropdown: {fileID: 2367013386767334010}
 --- !u!1 &8069266925327663125
 GameObject:
   m_ObjectHideFlags: 0
@@ -1109,7 +1123,7 @@ MonoBehaviour:
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 1
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 

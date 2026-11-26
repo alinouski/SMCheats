@@ -216,7 +216,7 @@ namespace SMCheats
 
                 BindChrome(valueView, option, context);
                 trackUpdate?.Invoke(() =>
-                    valueView.TitleText.text = CheatsTabUiUtility.FormatValue(option.ValueData.Getter?.Invoke()));
+                    valueView.ValueText.text = CheatsTabUiUtility.FormatValue(option.ValueData.Getter?.Invoke()));
             }
         }
 
@@ -372,7 +372,7 @@ namespace SMCheats
 
                 BindChrome(valueView, option, context);
                 trackUpdate?.Invoke(() =>
-                    valueView.TitleText.text = CheatsTabUiUtility.FormatValue(option.ValueData.Getter?.Invoke()));
+                    valueView.ValueText.text = CheatsTabUiUtility.FormatValue(option.ValueData.Getter?.Invoke()));
             }
         }
 

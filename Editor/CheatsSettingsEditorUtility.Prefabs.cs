@@ -574,6 +574,8 @@ namespace SMCheats.Editor
         {
             var root = CreateOptionControlRoot<global::SMCheats.CheatsValueOptionView>("ValueOption", runtimeFont, out var view, out _, out var controlRoot, out _, out _);
             var valueText = CreateText("Value", controlRoot, string.Empty, runtimeFont, 15, TextAnchor.MiddleLeft);
+            valueText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            valueText.verticalOverflow = VerticalWrapMode.Truncate;
             valueText.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
 
             var serializedObject = new SerializedObject(view);
@@ -611,8 +613,8 @@ namespace SMCheats.Editor
             layoutGroup.spacing = 8f;
             layoutGroup.padding = new RectOffset(8, 8, 8, 8);
             layoutGroup.childAlignment = TextAnchor.MiddleLeft;
-            layoutGroup.childControlHeight = false;
-            layoutGroup.childControlWidth = false;
+            layoutGroup.childControlHeight = true;
+            layoutGroup.childControlWidth = true;
             layoutGroup.childForceExpandHeight = false;
             layoutGroup.childForceExpandWidth = false;
 
@@ -622,7 +624,8 @@ namespace SMCheats.Editor
 
             view = root.GetComponent<TView>();
             titleText = CreateText("Label", root.transform, "Option", runtimeFont, 15, TextAnchor.MiddleLeft);
-            titleText.gameObject.AddComponent<LayoutElement>().preferredWidth = 220f;
+            titleText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            titleText.verticalOverflow = VerticalWrapMode.Truncate;
 
             controlRoot = CreateLayoutRoot("ControlRoot", root.transform, false, 8f, new RectOffset(0, 0, 0, 0));
             var controlLayout = controlRoot.gameObject.AddComponent<LayoutElement>();
@@ -794,6 +797,8 @@ namespace SMCheats.Editor
             layoutElement.flexibleWidth = 1f;
 
             var captionText = CreateText("Label", root.transform, string.Empty, runtimeFont, 15, TextAnchor.MiddleLeft);
+            captionText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            captionText.verticalOverflow = VerticalWrapMode.Truncate;
             Stretch((RectTransform)captionText.transform, 10f);
             ((RectTransform)captionText.transform).offsetMax = new Vector2(-28f, -10f);
 
@@ -866,6 +871,10 @@ namespace SMCheats.Editor
             scrollRect.horizontal = false;
             scrollRect.vertical = true;
             scrollRect.movementType = ScrollRect.MovementType.Clamped;
+            var dropdownLayout = root.AddComponent<global::SMCheats.CheatsDropdownLayoutElement>();
+            var serializedLayout = new SerializedObject(dropdownLayout);
+            serializedLayout.FindProperty("_dropdown").objectReferenceValue = dropdown;
+            serializedLayout.ApplyModifiedPropertiesWithoutUndo();
             return dropdown;
         }
 
@@ -1173,6 +1182,8 @@ namespace SMCheats.Editor
             layoutElement.minWidth = 64f;
 
             label = CreateText("Label", buttonRoot.transform, text, runtimeFont, 16, TextAnchor.MiddleCenter);
+            label.horizontalOverflow = HorizontalWrapMode.Overflow;
+            label.verticalOverflow = VerticalWrapMode.Truncate;
             Stretch((RectTransform)label.transform, 8f);
             return buttonRoot.GetComponent<Button>();
         }

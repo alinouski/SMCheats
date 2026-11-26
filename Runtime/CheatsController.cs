@@ -59,6 +59,13 @@ namespace SMCheats
             DontDestroyOnLoad(gameObject);
         }
 
+        private void OnApplicationQuit()
+        {
+            _services?.Get<CheatsConsoleService>()?.StopListening();
+            UnregisterPanels();
+            UnregisterTickableServices();
+        }
+
         private void OnDestroy()
         {
             UnregisterPanels();

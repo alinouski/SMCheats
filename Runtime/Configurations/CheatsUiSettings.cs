@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SMCheats
@@ -7,6 +8,7 @@ namespace SMCheats
     public sealed class CheatsUiSettings
     {
         private static CheatsUiColorSettings _resourceColors;
+        private static readonly Dictionary<string, Sprite> DefaultIcons = new();
 
         [SerializeField]
         private CheatsTabIconsSettings _tabIcons = new();
@@ -43,14 +45,18 @@ namespace SMCheats
             : GetResourceColors();
 
         public CheatsTabIconsSettings TabIcons => _tabIcons ??= new CheatsTabIconsSettings();
-        public Sprite ToggleActiveIcon => _toggleActiveIcon;
-        public Sprite ToggleInactiveIcon => _toggleInactiveIcon;
-        public Sprite UpdateIcon => _updateIcon;
-        public Sprite ClearIcon => _clearIcon;
-        public Sprite SearchIcon => _searchIcon;
-        public Sprite OpenCheatsIcon => _openCheatsIcon;
-        public Sprite PinnedConsoleExpandedIcon => _pinnedConsoleExpandedIcon;
-        public Sprite PinnedConsoleCollapsedIcon => _pinnedConsoleCollapsedIcon;
+        public Sprite ToggleActiveIcon => _toggleActiveIcon ? _toggleActiveIcon : GetDefaultIcon("toggle_right_icon_128728");
+        public Sprite ToggleInactiveIcon => _toggleInactiveIcon ? _toggleInactiveIcon : GetDefaultIcon("toggle_left_icon_128729");
+        public Sprite UpdateIcon => _updateIcon ? _updateIcon : GetDefaultIcon("rotate_cw_icon_128766");
+        public Sprite ClearIcon => _clearIcon ? _clearIcon : GetDefaultIcon("trash_icon_128726");
+        public Sprite SearchIcon => _searchIcon ? _searchIcon : GetDefaultIcon("search_magnifier_icon_145939");
+        public Sprite OpenCheatsIcon => _openCheatsIcon ? _openCheatsIcon : GetDefaultIcon("terminal_icon_128733");
+        public Sprite PinnedConsoleExpandedIcon => _pinnedConsoleExpandedIcon
+            ? _pinnedConsoleExpandedIcon
+            : GetDefaultIcon("chevron_up_icon_128917");
+        public Sprite PinnedConsoleCollapsedIcon => _pinnedConsoleCollapsedIcon
+            ? _pinnedConsoleCollapsedIcon
+            : GetDefaultIcon("chevron_down_icon_128920");
         
         public Color TextColor => Colors.TextColor;
         public Color IconColor => Colors.IconColor;
@@ -82,6 +88,17 @@ namespace SMCheats
         public Color GetConsoleLogTypeColor(LogType type)
         {
             return Colors.GetConsoleLogTypeColor(type);
+        }
+
+        internal static Sprite GetDefaultIcon(string name)
+        {
+            if (!DefaultIcons.TryGetValue(name, out var icon) || !icon)
+            {
+                icon = Resources.Load<Sprite>("SMCheats/Icons/" + name);
+                DefaultIcons[name] = icon;
+            }
+
+            return icon;
         }
 
         private static CheatsUiColorSettings GetResourceColors()

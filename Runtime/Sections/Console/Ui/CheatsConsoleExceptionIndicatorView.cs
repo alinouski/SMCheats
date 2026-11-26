@@ -22,7 +22,7 @@ namespace SMCheats
         public void Flash()
         {
             _remainingFlashTime = Mathf.Max(_remainingFlashTime, Mathf.Max(0.1f, _flashDuration));
-            gameObject?.SetActive(true);
+            gameObject.SetActive(true);
         }
 
         private void Update()
