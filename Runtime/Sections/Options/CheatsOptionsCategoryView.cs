@@ -31,7 +31,14 @@ namespace SMCheats
         public void Initialize(string title, bool isSelected, bool isContentVisible)
         {
             _headerButton.Label.text = title ?? string.Empty;
-            _headerButton.IsSelected = isSelected;
+            _headerButton.IsSelected = false;
+            var titleColor = isSelected ? CheatsSettingsProxy.UiSettings.PinnedColor : CheatsSettingsProxy.UiSettings.TextColor;
+            if (isSelected)
+            {
+                titleColor.a = 1f;
+            }
+
+            _headerButton.Label.color = titleColor;
 
             _contentRoot.gameObject.SetActive(isContentVisible);
 
