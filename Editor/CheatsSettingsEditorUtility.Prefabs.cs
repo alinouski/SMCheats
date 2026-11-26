@@ -1289,7 +1289,8 @@ namespace SMCheats.Editor
             textObject.transform.localScale = Vector3.one;
             var uiText = textObject.GetComponent<Text>();
             uiText.font = runtimeFont;
-            uiText.fontSize = fontSize;
+            uiText.resizeTextMinSize = 15;
+            uiText.fontSize = Mathf.Max(15, fontSize);
             uiText.alignment = alignment;
             uiText.color = Color.white;
             uiText.horizontalOverflow = HorizontalWrapMode.Wrap;

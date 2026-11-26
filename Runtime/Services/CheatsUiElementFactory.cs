@@ -110,7 +110,8 @@ namespace SMCheats
             textObject.transform.SetParent(parent, false);
             var uiText = textObject.GetComponent<Text>();
             uiText.font = GetFont();
-            uiText.fontSize = fontSize;
+            uiText.resizeTextMinSize = 15;
+            uiText.fontSize = Mathf.Max(15, fontSize);
             uiText.alignment = alignment;
             uiText.color = CheatsSettingsProxy.UiSettings.TextColor;
             uiText.horizontalOverflow = HorizontalWrapMode.Wrap;

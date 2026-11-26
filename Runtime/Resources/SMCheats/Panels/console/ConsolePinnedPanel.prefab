@@ -147,7 +147,7 @@ MonoBehaviour:
     m_FontSize: 15
     m_FontStyle: 0
     m_BestFit: 1
-    m_MinSize: 10
+    m_MinSize: 15
     m_MaxSize: 40
     m_Alignment: 3
     m_AlignByGeometry: 0
@@ -288,7 +288,7 @@ MonoBehaviour:
     m_FontSize: 15
     m_FontStyle: 0
     m_BestFit: 1
-    m_MinSize: 10
+    m_MinSize: 15
     m_MaxSize: 40
     m_Alignment: 3
     m_AlignByGeometry: 0

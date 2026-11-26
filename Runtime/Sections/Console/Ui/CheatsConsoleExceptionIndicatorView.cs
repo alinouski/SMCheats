@@ -21,6 +21,11 @@ namespace SMCheats
 
         public void Flash()
         {
+            if (!this || Application.exitCancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
             _remainingFlashTime = Mathf.Max(_remainingFlashTime, Mathf.Max(0.1f, _flashDuration));
             gameObject.SetActive(true);
         }
