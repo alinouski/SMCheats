@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.6
+
+- Guard exception indicator callbacks during Play Mode shutdown.
+- Increase minimum font size and UI scale; place option toggle icons beside their labels and align header buttons.
+- Keep pinned FPS and CPU graphs on screen without overlapping; wrap statistics and resize the main profiler graphs.
+- Keep CPU recorder samples updating, select rendering markers for URP and Built-in, and refresh late marker availability.
+
 ## 0.2.1
 
 - CPU profiler categories are measured with player loop markers and work with any render pipeline.
