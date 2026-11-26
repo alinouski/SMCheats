@@ -11,9 +11,10 @@ namespace SMCheats
         private const int RecorderRetryIntervalFrames = 120;
 
         private static readonly ProfilerRecorderOptions FrameRecorderOptions =
-            ProfilerRecorderOptions.StartImmediately;
-        private static readonly ProfilerRecorderOptions CategoryRecorderOptions =
             ProfilerRecorderOptions.StartImmediately |
+            ProfilerRecorderOptions.WrapAroundWhenCapacityReached;
+        private static readonly ProfilerRecorderOptions CategoryRecorderOptions =
+            FrameRecorderOptions |
             ProfilerRecorderOptions.SumAllSamplesInFrame;
 
         private readonly float[] _frameTimeSamples;
@@ -38,7 +39,6 @@ namespace SMCheats
                 "Gfx.WaitForPresentOnGfxThread",
                 "Gfx.WaitForRenderThread");
 
-            // Player loop markers work for every render pipeline; Camera.Render, for example, exists only in Built-in RP.
             // Category markers are recorded only in the editor and development builds, "Main Thread" is available everywhere.
             _categoryRecorders = !Debug.isDebugBuild
                 ? Array.Empty<CategoryRecorder>()
@@ -49,7 +49,7 @@ namespace SMCheats
                         "Update.ScriptRunBehaviourUpdate",
                         "PreLateUpdate.ScriptRunBehaviourLateUpdate",
                         "FixedUpdate.ScriptRunBehaviourFixedUpdate",
-                        "Update.ScriptRunDelayedDynamicFrameRate",
+                        "PostLateUpdate.ScriptRunDelayedDynamicFrameRate",
                         "FixedUpdate.ScriptRunDelayedFixedFrameRate"),
                     new CategoryRecorder(CheatsCpuProfilerCategory.Physics, "FixedUpdate.PhysicsFixedUpdate"),
                     new CategoryRecorder(CheatsCpuProfilerCategory.Physics2D, "FixedUpdate.Physics2DFixedUpdate"),
@@ -58,7 +58,13 @@ namespace SMCheats
                         "PreLateUpdate.DirectorUpdateAnimationBegin",
                         "PreLateUpdate.DirectorUpdateAnimationEnd",
                         "PreLateUpdate.LegacyAnimationUpdate"),
-                    new CategoryRecorder(CheatsCpuProfilerCategory.Rendering, "PostLateUpdate.FinishFrameRendering"),
+                    new CategoryRecorder(
+                        CheatsCpuProfilerCategory.Rendering,
+                        true,
+                        "Inl_UniversalRenderTotal",
+                        "RenderLoop",
+                        "Camera.Render",
+                        "PostLateUpdate.FinishFrameRendering"),
                     new CategoryRecorder(CheatsCpuProfilerCategory.UI, "PostLateUpdate.PlayerUpdateCanvases"),
                     new CategoryRecorder(CheatsCpuProfilerCategory.Audio, "PostLateUpdate.UpdateAudio")
                 };
@@ -212,12 +218,19 @@ namespace SMCheats
         {
             private readonly string[] _markerNames;
             private readonly ProfilerRecorder[] _recorders;
+            private readonly bool _useFirstAvailableMarker;
 
             public CategoryRecorder(CheatsCpuProfilerCategory category, params string[] markerNames)
+                : this(category, false, markerNames)
+            {
+            }
+
+            public CategoryRecorder(CheatsCpuProfilerCategory category, bool useFirstAvailableMarker, params string[] markerNames)
             {
                 Category = category;
                 _markerNames = markerNames;
                 _recorders = new ProfilerRecorder[markerNames.Length];
+                _useFirstAvailableMarker = useFirstAvailableMarker;
             }
 
             public CheatsCpuProfilerCategory Category { get; }
@@ -230,20 +243,40 @@ namespace SMCheats
                 {
                     if (_recorders[i].Valid)
                     {
+                        if (_useFirstAvailableMarker)
+                        {
+                            break;
+                        }
+
                         continue;
                     }
 
                     _recorders[i] = TryCreateRecorder(_markerNames[i], CategoryRecorderOptions);
                     IsAvailable |= _recorders[i].Valid;
+                    if (_useFirstAvailableMarker && _recorders[i].Valid)
+                    {
+                        break;
+                    }
                 }
             }
 
             public void Tick()
             {
                 var currentMs = 0f;
+                IsAvailable = false;
                 for (var i = 0; i < _recorders.Length; i++)
                 {
+                    if (!_recorders[i].Valid)
+                    {
+                        continue;
+                    }
+
+                    IsAvailable = true;
                     currentMs += ReadMilliseconds(_recorders[i]);
+                    if (_useFirstAvailableMarker)
+                    {
+                        break;
+                    }
                 }
 
                 CurrentMs = currentMs;
